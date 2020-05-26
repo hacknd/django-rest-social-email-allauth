@@ -70,3 +70,11 @@ SECRET_KEY = '1q%7#a9-=(s_&qo)2m^arnjpwvf07j+8=+d8x8von%8u4x0io%'
 STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = "rest_social_email_auth.User"
+
+TEST_RUNNER = 'tests.runner.PytestTestRunner'
+
+
+EMAIL_AUTH = {
+    "EMAIL_VERIFICATION_URL": "https://example.com/verify/{key}",
+    "PASSWORD_RESET_URL": "https://example.com/reset/{key}",
+}
