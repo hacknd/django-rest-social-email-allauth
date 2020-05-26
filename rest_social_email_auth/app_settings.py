@@ -97,7 +97,7 @@ class AppSettings(object):
 		return self._setting("PASSWORD_RESET_URL", "")
 
 	@property
-	def REGISTRATION_SERIALIZER(self):
+	def USER_SERIALIZER(self):
 		"""
 		The serializer class used for registering new users.
 		"""
@@ -105,8 +105,8 @@ class AppSettings(object):
 
 		return import_string(
 			self._setting(
-				"REGISTRATION_SERIALIZER", 
-				"client_auth.serializers.CreateAccountSerializer",
+				"USER_SERIALIZER", 
+				"rest_social_email_auth.serializers.CreateUserSerializer",
 			)
 		)
 
