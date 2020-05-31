@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
 from datetime import timedelta
+from decouple import config
 
 import os
 
@@ -30,6 +31,7 @@ INSTALLED_APPS = [
     "social_django",
     "rest_framework",
     "rest_framework.authtoken",
+    "rest_social_auth",
     "knox",
 
     # Local Package
@@ -64,6 +66,18 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+SOCIAL_AUTH_PIPELINE=(
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+    )
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -93,3 +107,7 @@ EMAIL_AUTH = {
     "EMAIL_VERIFICATION_URL": "https://example.com/verify/{key}",
     "PASSWORD_RESET_URL": "https://example.com/reset/{key}",
 }
+
+#Discord Credentials here
+SOCIAL_AUTH_DISCORD_KEY=config('SOCIAL_AUTH_DISCORD_KEY')
+SOCIAL_AUTH_DISCORD_SECRET=config('SOCIAL_AUTH_DISCORD_SECRET')
