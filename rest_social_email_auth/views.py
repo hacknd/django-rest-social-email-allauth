@@ -9,9 +9,17 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 # Installed Packages
 from knox.views import LoginView
-
+from knox import (
+		settings,
+		models,
+		auth,
+		views
+)
 # Django Packages
-from django.contrib.auth import login
+from django.contrib.auth import (
+	login,
+	signals
+)
 
 # Local Packages
 from rest_social_email_auth import app_settings
@@ -62,3 +70,51 @@ class UserLoginView(LoginView):
 			status=status.HTTP_201_CREATED,
 			headers={'Authorization': 'Token {0}'.format(token)}
 		)
+
+class UserLogoutView(views.APIView):
+	"""
+	Logging out a single device
+	closing a single session
+	"""
+	authentication_classes = (auth.TokenAuthentication,)
+	permission_classes = (permissions.IsAuthenticated,)
+
+	def post(self, request, *args, **kwargs):
+		request._auth.delete()
+		signals.user_logged_out.send(
+			sender=request.user.__class__,
+			request=request,
+			user=request.user,
+			*args,
+			**kwargs
+		)
+		return response.Response(None, status.HTTP_204_NO_CONTENT, *args, **kwargs)
+
+	def get(self, request, *args, **kwargs):
+		return HttpResponseRedirect('/api/v1/', *args, **kwargs)
+
+
+class UserLogoutAllView(views.APIView):
+	"""
+	Log the user out of all sessions
+	I.E delete all auth tokens for the user
+	"""
+	authentication_classes = (auth.TokenAuthentication,)
+	permission_classes = (permissions.IsAuthenticated,)
+
+	def post(self, request, *args, **kwargs):
+		request.user.auth_token_set.all().delete()
+		signals.user_logged_out.send(
+			sender=request.user.__class__,
+			request=request,
+			user=request.user
+		)
+		return response.Response(
+			None,
+			status=status.HTTP_204_NO_CONTENT,
+			*args,
+			**kwargs
+		)
+
+	def get(self, request, *args, **kwargs):
+		return HttpResponseRedirect('/api/v1/', *args, **kwargs)
