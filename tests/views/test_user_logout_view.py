@@ -49,7 +49,7 @@ class UserTokenLogoutTest(APITestCase):
 						 AuthToken.objects.latest('user_id').token_key)
 		self.client.post(self.create_url, data, format='json')
 		self.assertTrue(all(e.token_key for e in AuthToken.objects.all()))
-		url = reverse('rest-social-email-auth:account-logout')
+		url = reverse('rest-social-email-auth:user-logout')
 		self.client.credentials(HTTP_AUTHORIZATION=response['Authorization'])
 		self.client.post(url, {}, format='json')
 		self.assertEqual(AuthToken.objects.count(), 1, 'other tokens should remain after logout')
@@ -72,7 +72,7 @@ class UserTokenLogoutTest(APITestCase):
 						 AuthToken.objects.latest('user_id').token_key)
 		self.client.post(self.create_url, data, format='json')
 		self.assertTrue(all(e.token_key for e in AuthToken.objects.all()))
-		url = reverse('rest-social-email-auth:account-logout-all')
+		url = reverse('rest-social-email-auth:user-logout-all')
 		self.client.credentials(HTTP_AUTHORIZATION=response['Authorization'])
 		self.client.post(url, {}, format='json')
 		self.assertEqual(AuthToken.objects.count(), 0,
