@@ -21,11 +21,16 @@ urlpatterns = [
 	path(
 		'logout/',
 		views.UserLogoutView.as_view(),
-		name='account-logout'
+		name='user-logout'
 	),
 	path(
 		'logout-all/',
 		views.UserLogoutAllView.as_view(),
-		name='account-logout-all'
+		name='user-logout-all'
+	),
+	path(
+		'login/social/<provider>/',
+		views.UserSocialLoginView.as_view(),
+		name='user-social-login'
 	),
 ]

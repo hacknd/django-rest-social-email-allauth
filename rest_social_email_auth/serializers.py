@@ -1,6 +1,9 @@
-# Installed Packages
+# DRF Packages
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+
+# Installed Packages
+from rest_social_auth.serializers import UserKnoxSerializer
 
 # Django Packages
 from django.contrib.auth import get_user_model, password_validation
@@ -97,3 +100,11 @@ class AccountSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = get_user_model()
 		fields = ('id', 'last_login', 'is_superuser', 'username', 'email', 'phone_number', 'is_active')
+
+
+# Social Logins serializer
+class SocialSerializer(UserKnoxSerializer):
+	def get_token(self, obj):
+		instance, token = models.AuthToken.objects.create(obj)
+		instance.save()
+		return token

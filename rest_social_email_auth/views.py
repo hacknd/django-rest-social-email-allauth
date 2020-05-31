@@ -15,14 +15,20 @@ from knox import (
 		auth,
 		views
 )
+from rest_social_auth.views import SocialKnoxUserAuthView
+
 # Django Packages
 from django.contrib.auth import (
-	login,
-	signals
+		login,
+		signals
 )
 
 # Local Packages
-from rest_social_email_auth import app_settings
+from rest_social_email_auth import (
+		app_settings,
+		utils,
+		serializers
+)
 
 # Local Variables
 current_format = None
@@ -69,6 +75,37 @@ class UserLoginView(LoginView):
 			json.data,
 			status=status.HTTP_201_CREATED,
 			headers={'Authorization': 'Token {0}'.format(token)}
+		)
+
+class UserSocialLoginView(SocialKnoxUserAuthView):
+	"""
+	Logging in a user that social verification is required and an authorization header is created in the django api side
+	"""
+	serializer_class = serializers.SocialSerializer
+
+	def get(self, request, provider, code=None, format=current_format):
+		try:
+			code = request.GET['code']
+			data = utils.OAuthRedirectAuthorizationBackend(provider, code)
+		except KeyError:
+			return utils.OAuthRedirectAuthorizationBackend(provider, code)
+		request.data.update(data)
+		return self.post(request, format)
+
+	def post(self, request, format=current_format, *args, **kwargs):
+		json = super(AccountSocialLoginView, self).post(
+			request,
+			format=current_format
+		)
+		token = models.AuthToken.objects.get(
+			token_key=json.data['token'][:settings.CONSTANTS.TOKEN_KEY_LENGTH]
+		)
+		data = {"token": json.data['token'], "expiry": token.expiry, "user": json.data}
+		login(request, token.user, backend='client.backends.AuthBackend')
+		return response.Response(
+			data,
+			status=status.HTTP_201_CREATED,
+			headers={'Authorization': 'Token {0}'.format(json.data['token'])}
 		)
 
 class UserLogoutView(views.APIView):
