@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
+from datetime import timedelta
 
 import os
 
@@ -37,6 +38,16 @@ INSTALLED_APPS = [
 
 SITE_ID = 1
 
+REST_KNOX = {
+    'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
+    'AUTH_TOKEN_CHARACTER_LENGTH': 64,
+    'TOKEN_TLL': timedelta(hours=10),
+    'USER_SERIALIZER': 'rest_social_email_auth.serializers.AccountSerializer',
+    'AUTO_REFRESH': False,
+    'TOKEN_LIMIT_PER_USER': None,
+}
+
+
 MIDDLEWARE = MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -45,7 +56,11 @@ MIDDLEWARE = MIDDLEWARE_CLASSES = (
 )
 
 AUTHENTICATION_BACKENDS = (
-    'social_core.backends.facebook.FacebookOAuth2',
+    # Custom Authentication Formula
+    'rest_social_email_auth.backends.AuthBackend',
+    #Discord OAuth2 Authentication
+    'social_core.backends.discord.DiscordOAuth2',
+
     'django.contrib.auth.backends.ModelBackend',
 )
 
