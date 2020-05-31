@@ -10,8 +10,12 @@ app_name = "rest-social-email-auth"
 urlpatterns = [
 	path(
 		'register/',
-		views.AccountCreateView.as_view(),
-		name='account-create'
+		views.UserCreateView.as_view(),
+		name='user-create'
 	),
-	
+	path(
+		'login/',
+		views.UserLoginView.as_view(),
+		name='user-login'
+	),
 ]
