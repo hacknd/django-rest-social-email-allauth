@@ -21,6 +21,7 @@ class UserFactory(factory.django.DjangoModelFactory):
 	password = "password"
 	username = factory.sequence(lambda n: "user{n}".format(n=n))
 	email = factory.sequence(lambda n: "test{n}@example.com".format(n=n))
+	phone_number = factory.sequence(lambda n: "+25471594357{n}".format(n=n))
 
 	class Meta(object):
 		model = get_user_model()
