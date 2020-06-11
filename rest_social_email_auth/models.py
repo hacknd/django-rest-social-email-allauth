@@ -1,6 +1,7 @@
 # Python Modules
 import logging
 import datetime
+import uuid
 
 # Installed Packages
 import email_utils
@@ -243,3 +244,72 @@ class EmailConfirmation(models.Model):
 			self.email.email,
 			self.email.user.id,
 		)
+
+
+class PasswordResetToken(models.Model):
+	"""
+	Store a token that can be used to reset a user's password.
+	"""
+
+	created_at = models.DateTimeField(
+		auto_now_add=True,
+		help_text=__("The time at which the paaword reset token was created."),
+		verbose_name=__("created at"),        
+	)
+	email = models.ForeignKey(
+		"rest_social_email_auth.EmailAddress",
+		editable=False,
+		help_text=__("The email address used to request the password reset."),
+		on_delete=models.CASCADE,
+		related_name="password_reset_tokens",
+		related_query_name="password_reset_token",
+		verbose_name=__("email address"),      
+	)
+	key = models.UUIDField(
+		default=uuid.uuid4,
+		editable=False,
+		help_text=__(
+			"The token that authorizes the user to reset their "
+			"password."
+		),
+		verbose_name=__("key"),
+	)
+	objects = models.Manager()
+	valid_tokens = managers.ValidPasswordResetTokenManager()
+
+
+	class Meta:
+		verbose_name = __("password reset token")
+		verbose_name_plural = __("password reset tokens")
+
+
+	def __str__(self):
+		"""
+		Get a string representation of the instance
+
+		Returns:
+			Information about the token's owner.
+		"""
+		return "Password reset token for '{}'".format(self.email.user)
+
+	def send(self):
+		"""
+		Send the password reset token to the iser.
+		"""
+		context = {
+			"reset_url": app_settings.PASSWORD_RESET_URL.format(key=self.key)
+		}
+
+		email_utils.send_email(
+			context=context,
+			from_email=settings.DEFAULT_FROM_EMAIL,
+			recipient_list=[self.email.email],
+			subject=__("Reset Your Password"),
+			template_name=app_settings.PATH_TO_RESET_EMAIL_TEMPLATE,
+		)
+		
+
+		logger.info("Sent password reset email to %s", self.email)
+
+
+

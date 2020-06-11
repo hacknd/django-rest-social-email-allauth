@@ -70,3 +70,14 @@ class EmailConfirmationFactory(factory.django.DjangoModelFactory):
 
 	class Meta(object):
 		model = models.EmailConfirmation
+
+
+class PasswordResetTokenFactory(factory.django.DjangoModelFactory):
+	"""
+	Factory for generating password reset tokens.
+	"""
+
+	email = factory.SubFactory("rest_social_email_auth.factories.EmailFactory")
+
+	class Meta(object):
+		model = "rest_social_email_auth.PasswordResetToken"
