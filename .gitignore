@@ -10,6 +10,7 @@ server/static
 build/
 dist/
 django_rest_social_email_auth.egg-info/
+docs/_build/
 ### macOS ###
 # General
 .DS_Store
