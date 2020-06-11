@@ -245,3 +245,28 @@ class ResendVerificationView(custom_generics.SerializerSaveView):
 	"""
 
 	serializer_class = serializers.ResendVerificationSerializer
+
+
+class PasswordResetRequestView(custom_generics.SerializerSaveView):
+	"""
+	post:
+	Request a password reset for the user with the provided email 
+	address. A reset token will be generated and emailed to the 
+	user.
+
+	Notes:
+	* The provided email address must be verified.
+	* The operation will appear successful even if no reset email is
+	sent. This is done to avoid leaking email addresses.
+	"""
+
+	serializer_class = serializers.PasswordResetRequestSerializer
+
+
+class PasswordResetView(custom_generics.SerializerSaveView):
+	"""
+	post:
+	Reset the user's password using the token that was emailed to them.
+	"""
+
+	serializer_class = serializers.PasswordResetSerializer
