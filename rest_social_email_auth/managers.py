@@ -1,7 +1,7 @@
 # Django Packages
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import gettext_lazy as __
-
+from django.db import models, transaction
 
 class CustomAccountManager(BaseUserManager):
 	"""
@@ -55,3 +55,24 @@ class CustomAccountManager(BaseUserManager):
 		super_user_account.save()
 
 		return super_user_account
+
+
+class EmailAddressManager(models.Manager):
+	"""
+	Manager for email address intances
+	"""
+
+	def create(self, *args, **kwargs):
+		"""
+		Create a new email address
+		"""
+		is_primary = kwargs.pop("is_primary", False)
+
+		with transaction.atomic():
+			email = super(EmailAddressManager, self).create(*args, **kwargs)
+
+
+			if is_primary:
+				email.set_primary()
+
+		return email

@@ -1,15 +1,22 @@
+# Python Modules
+import logging
+
 # Django Modules
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as __
-
+from django.conf import settings
+from django.contrib.auth import get_user_model
 #Local Modules
-from rest_social_email_auth import managers
+from rest_social_email_auth import managers, app_settings
+
+
+# Local Variables
+logger = logging.getLogger(__name__)
+
 
 # Create your models here.
-
-
 class User(AbstractUser):
 	username = models.CharField(
 		max_length=13,
@@ -35,3 +42,91 @@ class User(AbstractUser):
 
 	def __str__(self):
 		return self.username
+
+
+class EmailAddress(models.Model):
+	"""
+	A user's email address
+	"""
+	created_at = models.DateTimeField(
+		auto_now_add=True,
+		verbose_name=__("email")
+	)
+	email = models.EmailField(
+		max_length=255,
+		unique=True,
+		verbose_name=__("email")
+	)
+	is_primary = models.BooleanField(
+		default=False,
+		help_text=__(
+			"Boolean indicating if the email is the user's primary address"
+		),
+		verbose_name=__("is primary"),
+	)
+	is_verified = models.BooleanField(
+		default=False,
+		help_text=__(
+			"Boolean indicating if the user has verified ownership of"
+			"the email address"
+		),
+		verbose_name=__("is verified")
+	)
+	user = models.ForeignKey(
+		get_user_model(),
+		on_delete=models.CASCADE,
+		related_name="email_addresses",
+		related_query_name="email_address",
+		verbose_name=__("user")
+	)
+
+
+	objects = managers.EmailAddressManager()
+
+	class Meta(object):
+		verbose_name = __("email address")
+		verbose_name_plural = __("email addresses")
+
+	def __str__(self):
+		"""
+		Get a string representation of the email address
+
+		Returns:
+			str:
+
+				A text version of the email address.
+		"""
+		return self.email
+
+	def send_duplicate_notification(self):
+		"""
+		Send anotification about a duplicate sign up
+		"""
+		email_utils.send_email(
+			from_email=settings.DEFAULT_FROM_EMAIL,
+			recipient_list=[self.email],
+			subject=_("Registration Attempt"),
+			template_name=app_settings.PATH_TO_DUPLICATE_EMAIL_TEMPLATE,
+		)
+
+		logger.info("Sent duplicate email notification to: %s", self.email)
+
+	def set_primary(self):
+		"""
+		Et this email address as the user's primary email.
+		"""
+		query = EmailAddress.objects.filter(is_primary=True, user=self.user)
+		query = query.exclude(pk=self.pk)
+
+		# The transaction is atomic so there is never a gap where a user has no primary email address.
+		with transaction.atomic():
+			query.update(is_primary=False)
+
+			self.is_primary = True
+			self.save()
+
+		logger.info(
+			"Set %s as the primary email address for %s.",
+			self.email,
+			self.user,
+		)

@@ -48,3 +48,14 @@ class UserFactory(factory.django.DjangoModelFactory):
 		user = manager.create_user(*args, **kwargs)
 		user.save()
 		return user
+
+class EmailFactory(factory.django.DjangoModelFactory):
+	"""
+	Factory for generating emailaddress.
+	"""
+	
+	email = factory.sequence(lambda n: "test{n}@example.com".format(n=n))
+	user = factory.SubFactory("rest_social_email_auth.factories.UserFactory")
+
+	class Meta(object):
+		model = models.EmailAddress
