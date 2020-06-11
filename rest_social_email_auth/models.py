@@ -1,5 +1,10 @@
 # Python Modules
 import logging
+import datetime
+
+# Installed Packages
+import email_utils
+from rest_framework import reverse
 
 # Django Modules
 from django.db import models, transaction
@@ -8,12 +13,29 @@ from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as __
 from django.conf import settings
 from django.contrib.auth import get_user_model
-#Local Modules
-from rest_social_email_auth import managers, app_settings
+from django.utils.crypto import get_random_string
+from django.utils import timezone
 
+#Local Modules
+from rest_social_email_auth import (
+		managers, 
+		app_settings,
+		signals
+)
 
 # Local Variables
 logger = logging.getLogger(__name__)
+
+def generate_token():
+	"""
+	Get a random 64 character string
+
+
+	Returns:
+		str:
+			A random 64 character string
+	"""
+	return get_random_string(length=64)
 
 
 # Create your models here.
@@ -98,6 +120,14 @@ class EmailAddress(models.Model):
 		"""
 		return self.email
 
+	def send_confirmation(self):
+		"""
+
+		Send a verification email for the email address.
+		"""
+		confirmation = EmailConfirmation.objects.create(email=self)
+		confirmation.send()
+
 	def send_duplicate_notification(self):
 		"""
 		Send anotification about a duplicate sign up
@@ -129,4 +159,87 @@ class EmailAddress(models.Model):
 			"Set %s as the primary email address for %s.",
 			self.email,
 			self.user,
+		)
+
+
+class EmailConfirmation(models.Model):
+	"""
+	Model to store a token used to verify an email address
+	"""
+
+	created_at = models.DateTimeField(
+		auto_now_add=True,
+		verbose_name=__("created_at")
+	)
+	email = models.ForeignKey(
+		"rest_social_email_auth.EmailAddress",
+		on_delete=models.CASCADE,
+		related_name="confirmations",
+		related_query_name="confirmation",
+		verbose_name=__("email"),
+	)
+	key = models.CharField(
+		default=generate_token,
+		editable=False,
+		max_length=255,
+		verbose_name=__("confirmation key")
+	)
+
+
+	class Meta(object):
+		verbose_name = __("email confirmation")
+		verbose_name_plural = __("email confirmations")
+
+
+
+	def confirm(self):
+		"""
+		Mark the intance's email as verified
+		"""
+		self.email.is_verified = True
+		self.email.save()
+
+		signals.email_verified.send(email=self.email, sender=self.__class__)
+
+		logger.info("Verified email address: %s", self.email.email)
+
+
+	@property
+	def is_expired(self):
+		"""
+		Determine of the confirmation has expired
+
+
+		Returns:
+			bool:
+			True if the confirmation has expired and False
+			otherwise.
+		"""
+		expiration_time = self.created_at + datetime.timedelta(days=1)
+
+		return timezone.now() > expiration_time
+
+	def send(self):
+		"""
+		Send a verification email to the user
+		"""
+		context = {
+			"verification_url": app_settings.EMAIL_VERIFICATION_URL.format(
+				key=self.key
+			)
+		}
+
+		email_utils.send_email(
+			context=context,
+			from_email=settings.EMAIL_HOST_USER,
+			recipient_list=[self.email.email],
+			subject=__("Please Verify Your Email Address"),
+			template_name=app_settings.PATH_TO_VERIFY_EMAIL_TEMPLATE,
+		)
+
+
+		logger.info(
+			"Sent confimration email to %s for user #%d",
+			self.email.email,
+			self.email.user.id,
 		)

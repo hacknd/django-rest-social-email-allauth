@@ -34,3 +34,19 @@ def test_create_second_primary(email_factory):
 	old_primary.refresh_from_db()
 
 	assert not old_primary.is_primary
+
+def test_send_confirmation(email_factory):
+	"""
+	Sending a confirmation should create an ``EmailConfirmation``
+	instance and send a verification email.
+	"""
+	email = email_factory()
+
+	with mock.patch(
+		"rest_social_email_auth.models.EmailConfirmation.send",
+		autospec=True
+	) as mock_send:
+		email.send_confirmation()
+
+	assert email.confirmations.count() == 1
+	assert mock_send.call_count == 1

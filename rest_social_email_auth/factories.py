@@ -49,6 +49,7 @@ class UserFactory(factory.django.DjangoModelFactory):
 		user.save()
 		return user
 
+
 class EmailFactory(factory.django.DjangoModelFactory):
 	"""
 	Factory for generating emailaddress.
@@ -59,3 +60,13 @@ class EmailFactory(factory.django.DjangoModelFactory):
 
 	class Meta(object):
 		model = models.EmailAddress
+
+
+class EmailConfirmationFactory(factory.django.DjangoModelFactory):
+	"""
+	Factory for generating email confirmations.
+	"""
+	email = factory.SubFactory("rest_social_email_auth.factories.EmailFactory")
+
+	class Meta(object):
+		model = models.EmailConfirmation
