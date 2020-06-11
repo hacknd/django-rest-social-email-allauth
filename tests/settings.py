@@ -59,7 +59,7 @@ MIDDLEWARE = MIDDLEWARE_CLASSES = (
 
 AUTHENTICATION_BACKENDS = (
     # Custom Authentication Formula
-    'rest_social_email_auth.backends.AuthBackend',
+    'rest_social_email_auth.authentication.AuthBackend',
     #Discord OAuth2 Authentication
     'social_core.backends.discord.DiscordOAuth2',
 
