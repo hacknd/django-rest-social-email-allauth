@@ -1,3 +1,6 @@
+# Python Packages
+import logging
+
 # DRF Packages
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -12,9 +15,12 @@ from django.utils.translation import gettext_lazy as __
 # Local Packages
 from rest_social_email_auth import (
 		signals,
-		models
+		models,
+		app_settings
 )
 
+# Local Variables
+logger = logging.getLogger(__name__)
 
 class CreateUserSerializer(serializers.ModelSerializer):
 	email = serializers.EmailField(
@@ -220,6 +226,124 @@ class EmailSerializer(serializers.ModelSerializer):
 				)
 			)
 		return is_primary
+
+class EmailVerificationSerializer(serializers.Serializer):
+	"""
+	Serializer for verifying an email address
+	"""
+	email = serializers.EmailField(read_only=True)
+	key = serializers.CharField(write_only=True)
+	password = serializers.CharField(
+		style={"input_type": "password"}, write_only=True
+	)
+
+	def __init__(self, *args, **kwargs):
+		"""
+		Conditionally remove the password field based on if a password is required to verify an email address
+
+		"""
+		super().__init__(*args, **kwargs)
+
+		self._confirmation = None
+
+		if not app_settings.EMAIL_VERIFICATION_PASSWORD_REQUIRED:
+			self.fields.pop("password")
+
+
+	def save(self):
+		"""
+		COnfirm the email address matching the confirmation key
+		"""
+		self._confirmation.confirm()
+		self._confirmation.delete()
+
+	def validate(self, data):
+		"""
+		Validate the provided data
+
+		Returns:
+			serializers.ValidationError:
+				If the provided password is invalid.
+		"""
+		user = self._confirmation.email.user
+
+		if (
+			app_settings.EMAIL_VERIFICATION_PASSWORD_REQUIRED
+			and not user.check_password(data["password"])
+		):
+			raise serializers.ValidationError(
+				__("The provided password is invalid.")
+			)
+
+		# Add email to returned data
+		data["email"] = self._confirmation.email.email
+
+		return data
+
+	def validate_key(self, key):
+		"""
+		Validate the provided confirmation key.
+
+		Returns:
+			str:
+				The validated confirmation key.
+
+		Raises:
+			serializers.ValidationError:
+				If there is no email confirmation with the given key or
+				the confirmation has expired.
+		"""
+		try:
+			confirmation = models.EmailConfirmation.objects.select_related(
+				"email__user"
+			).get(key=key)
+		except models.EmailConfirmation.DoesNotExist:
+			raise serializers.ValidationError(
+				__("The provided verification key is invalide.")
+			)
+
+		if confirmation.is_expired:
+			raise serializers.ValidationError(
+				__("That verification code has expired.")
+			)
+
+
+		# Cache 
+		self._confirmation = confirmation
+
+		return key
+
+class ResendVerificationSerializer(serializers.Serializer):
+	"""
+	Serializer for resending a verification email.
+	"""
+
+	email = serializers.EmailField()
+
+	def save(self):
+		"""
+		Resend a verification email to the provided address.
+
+		If the provided email is alreadt verified no action is taken.
+		"""        
+		try:
+			email = models.EmailAddress.objects.get(
+				email=self.validated_data["email"], is_verified=False
+			)
+
+			logger.debug(   
+				"Resending verification email to %s",
+				self.validated_data["email"]
+			)
+
+			email.send_confirmation()
+		except models.EmailAddress.DoesNotExist:
+			logger.debug(
+				"Not resending verification email to %s because the address"
+				"doesn't exist in the database.",
+				self.validated_data["email"],
+			)
+
 
 class AccountSerializer(serializers.ModelSerializer):
 	class Meta:
