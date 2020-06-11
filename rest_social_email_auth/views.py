@@ -155,3 +155,76 @@ class UserLogoutAllView(views.APIView):
 
 	def get(self, request, *args, **kwargs):
 		return HttpResponseRedirect('/api/v1/', *args, **kwargs)
+
+
+class EmailDetailView(generics.RetrieveUpdateDestroyAPIView):
+	"""
+	delete:
+    	Delete a specific email address.
+
+    get:
+    	Retrieve the details of a particular email address.
+    
+    patch:
+    	Partially update an email address.
+    	
+    	Only a verified email address may be marked as the user's primary
+    	email.
+   
+    put:
+    	Update an email address.
+    	
+    	Only a verified email address may be marked as the user's primary
+   		email.
+	"""
+	permission_classes = (permissions.IsAuthenticated, )
+	serializer_class = serializers.EmailSerializer
+
+	def get_queryset(self):
+		"""
+		Get the email addresses belonging to the requesting user.
+
+		Returns:
+			A queryset containing only the email addresses owned by the 
+			requesting user.
+		"""
+		return self.request.user.email_addresses.all()
+
+
+class EmailListView(generics.ListCreateAPIView):
+	"""
+	get:
+	List the email address associated with the requesting user's
+	account.
+
+	post:
+	Add a new email address to the requesting user's account.
+	"""
+
+	permission_classes = (permissions.IsAuthenticated, )
+	serializer_class = serializers.EmailSerializer
+
+	def get_queryset(self):
+		"""
+		Get the email addresses belonging to the requesting user.
+
+
+		Returns:
+			A queryset containg only the email addresses owned by the requesting user.
+		"""
+		return self.request.user.email_addresses.all()
+
+	def perform_create(self, serializer):
+		"""
+		Create a new email address to the requesting user.
+
+		Args:
+			serializer:
+				An instance of the view's serializer class containing
+				the data submitted in the request.
+
+
+		Returns:
+			The newly created email address.
+		"""
+		return serializer.save(user=self.request.user)

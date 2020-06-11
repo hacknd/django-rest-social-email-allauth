@@ -1,5 +1,6 @@
 # Django Packages
 from django.urls import path
+from django.conf.urls import url
 
 # Local Packages
 from rest_social_email_auth import views
@@ -32,5 +33,15 @@ urlpatterns = [
 		'login/social/<provider>/',
 		views.UserSocialLoginView.as_view(),
 		name='user-social-login'
+	),
+	path(
+		'emails/',
+		views.EmailListView.as_view(),
+		name="email-list"
+	),
+	url(
+		r"^emails/(?P<pk>[0-9]+)/$",
+		views.EmailDetailView.as_view(),
+		name="email-detail",
 	),
 ]
