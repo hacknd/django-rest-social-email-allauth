@@ -93,5 +93,5 @@ def test_send(mock_send_email, email_confirmation_factory, settings):
 		"from_email": settings.EMAIL_HOST_USER, 
 		"recipient_list": [confirmation.email.email],
 		"subject": "Please Verify Your Email Address",
-		"template_name": "emails/verify-email"
+		"template_name": "rest_social_email_auth/emails/verify-email"
 }

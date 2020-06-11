@@ -120,7 +120,7 @@ class AppSettings(object):
 
 		return self._setting(
 			"PATH_TO_RESET_EMAIL_TEMPLATE",
-			"emails/rest-password"
+			"rest_social_email_auth/emails/reset-password"
 		)
 
 	@property
@@ -133,7 +133,7 @@ class AppSettings(object):
 
 		return self._setting(
 			"PATH_TO_VERIFY_EMAIL_TEMPLATE",
-			"emails/verify-email"
+			"rest_social_email_auth/emails/verify-email"
 		)
 
 	@property
@@ -145,7 +145,7 @@ class AppSettings(object):
 
 		return self._setting(
 			"PATH_TO_DUPLICATE_EMAIL_TEMPLATE",
-			"emails/diplicate-email"
+			"rest_social_email_auth/emails/duplicate-email"
 			)
 
 
