@@ -140,7 +140,7 @@ class EmailSerializer(serializers.ModelSerializer):
 			email.send_duplicate_notification()
 		else:
 				email = super(EmailSerializer, self).create(validated_data)
-				# email.send_confirmation()
+				email.send_confirmation()
 
 				user = validated_data.get("user")
 				query = models.EmailAddress.objects.filter(
@@ -344,6 +344,104 @@ class ResendVerificationSerializer(serializers.Serializer):
 				self.validated_data["email"],
 			)
 
+class PasswordResetRequestSerializer(serializers.Serializer):
+	"""
+	Serializer for requesting a password reset.
+	"""
+
+	email = serializers.EmailField(
+		help_text=__("The email address to send the password reset to.")
+	)
+
+	def save(self):
+		"""
+		Send out a password reset if the provided data is valid
+
+		fuck I'm being too formal its depressing. covid fuck you.
+
+		Returns:
+			The password reset token if it was returned and ``None``
+			otherwise.
+		"""
+		try:
+			email = models.EmailAddress.objects.get(
+				email=self.validated_data["email"], is_verified=True
+			)
+		except models.EmailAddress.DoesNotExist:
+			return None
+
+		token = models.PasswordResetToken.objects.create(email=email)
+		token.send()
+
+		return token
+
+class PasswordResetSerializer(serializers.Serializer):
+	"""
+	Serializer for reset a user's password.
+	"""
+	key = serializers.UUIDField(
+		help_text=__("The key recieved by the user in the password reset "
+		" email."
+		),
+		write_only=True,
+	)
+	password = serializers.CharField(
+		help_text=__("The account's new password."),
+		style={"input_type": "password"},
+		write_only=True,
+	)
+
+	def save(self):
+		"""
+		Reset the user's password if th eprovided information is valid.
+		"""
+		token = models.PasswordResetToken.objects.get(
+			key=self.validated_data["key"]
+		)
+
+		token.email.user.set_password(self.validated_data["password"])
+		token.email.user.save()
+
+
+		logger.info("Reset password for %s", token.email.user)
+
+		token.delete()
+
+	def validate_key(self, key):
+		"""
+		Validate the provided reset key.
+
+
+		Returns:
+			The validated key.
+
+		Raises:
+			serializers.ValidationError:
+				If the provided key does not exist.
+		"""
+		if not models.PasswordResetToken.valid_tokens.filter(key=key).exists():
+			raise serializers.ValidationError(
+				__("The provided reset token  does not exist, or is expired.")
+			)
+
+		return key
+
+	def validate_password(self, password):
+		"""
+		Validate the provided password by running it through Django's
+		password validation system.
+
+		Returns:
+			The validated password.
+
+		Raises:
+			ValidationError:
+				If the provided password does not pass the configured
+				password validators.
+		"""
+		password_validation.validate_password(password)
+
+		return password
 
 class AccountSerializer(serializers.ModelSerializer):
 	class Meta:
