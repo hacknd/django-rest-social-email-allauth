@@ -27,7 +27,8 @@ from django.contrib.auth import (
 from rest_social_email_auth import (
 		app_settings,
 		utils,
-		serializers
+		serializers,
+		generics as custom_generics
 )
 
 # Local Variables
@@ -228,3 +229,19 @@ class EmailListView(generics.ListCreateAPIView):
 			The newly created email address.
 		"""
 		return serializer.save(user=self.request.user)
+
+
+class EmailVerificationView(custom_generics.SerializerSaveView):
+	"""
+	Verify s user's email address.
+	"""
+
+	serializer_class = serializers.EmailVerificationSerializer
+
+
+class ResendVerificationView(custom_generics.SerializerSaveView):
+	"""
+	Resend an email verification to a specific address.
+	"""
+
+	serializer_class = serializers.ResendVerificationSerializer

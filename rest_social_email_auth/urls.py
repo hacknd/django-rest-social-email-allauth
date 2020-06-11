@@ -44,4 +44,14 @@ urlpatterns = [
 		views.EmailDetailView.as_view(),
 		name="email-detail",
 	),
+	path(
+		'verify-email/',
+		views.EmailVerificationView.as_view(),
+		name="verify-email",
+	),
+	path(
+		'resend-verification/',
+		views.ResendVerificationView.as_view(),
+		name="resend-verification",
+	),
 ]
