@@ -61,10 +61,17 @@ html_theme = 'sphinx_rtd_theme'
 source_suffix = ".rst"
 
 # The master tocktree document.
-master_doc = "contents"
+master_doc = "index"
 
 # The current version
 version = "0.1.0"
 
 # The current release
 release = "0.1.0"
+
+
+# Configuration for 'sphinx-issues'
+issues_github_path = "hacknd/django-rest-social-email-auth"
+
+
+
