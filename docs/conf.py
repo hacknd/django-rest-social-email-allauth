@@ -56,3 +56,15 @@ html_theme = 'sphinx_rtd_theme'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 # html_static_path = ['_static']
+
+# The suffix(es) of source filenames.
+source_suffix = ".rst"
+
+# The master tocktree document.
+master_doc = "contents"
+
+# The current version
+version = "0.1.0"
+
+# The current release
+release = "0.1.0"
