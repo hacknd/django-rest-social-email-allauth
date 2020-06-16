@@ -31,9 +31,7 @@ def test_clean_just_expired(email_confirmation_factory, settings):
     """
     Email confirmations that have just expired should not be removed.
     """
-    settings.EMAIL_AUTH = {
-        "CONFIRMATION_EXPIRATION": datetime.timedelta(seconds=0)
-    }
+    settings.EMAIL_AUTH = {"CONFIRMATION_EXPIRATION": datetime.timedelta(seconds=0)}
 
     email_confirmation_factory()
 

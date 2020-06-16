@@ -14,21 +14,21 @@ from rest_social_email_auth import models
 
 
 class UserFactory(factory.django.DjangoModelFactory):
-	"""
+    """
 	Factory for generating Django user instances.
 	"""
 
-	password = "password"
-	username = factory.sequence(lambda n: "user{n}".format(n=n))
-	email = factory.sequence(lambda n: "test{n}@example.com".format(n=n))
-	phone_number = factory.sequence(lambda n: "+25471594357{n}".format(n=n))
+    password = "password"
+    username = factory.sequence(lambda n: "user{n}".format(n=n))
+    email = factory.sequence(lambda n: "test{n}@example.com".format(n=n))
+    phone_number = factory.sequence(lambda n: "+25471594357{n}".format(n=n))
 
-	class Meta(object):
-		model = get_user_model()
+    class Meta(object):
+        model = get_user_model()
 
-	@classmethod
-	def _create(cls, model_class, *args, **kwargs):
-		"""
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        """
 		Create a new user instance
 
 		Args:
@@ -44,40 +44,41 @@ class UserFactory(factory.django.DjangoModelFactory):
 			``model_class``.
 		"""
 
-		manager = cls._get_manager(model_class)
-		user = manager.create_user(*args, **kwargs)
-		user.save()
-		return user
+        manager = cls._get_manager(model_class)
+        user = manager.create_user(*args, **kwargs)
+        user.save()
+        return user
 
 
 class EmailFactory(factory.django.DjangoModelFactory):
-	"""
+    """
 	Factory for generating emailaddress.
 	"""
-	
-	email = factory.sequence(lambda n: "test{n}@example.com".format(n=n))
-	user = factory.SubFactory("rest_social_email_auth.factories.UserFactory")
 
-	class Meta(object):
-		model = models.EmailAddress
+    email = factory.sequence(lambda n: "test{n}@example.com".format(n=n))
+    user = factory.SubFactory("rest_social_email_auth.factories.UserFactory")
+
+    class Meta(object):
+        model = models.EmailAddress
 
 
 class EmailConfirmationFactory(factory.django.DjangoModelFactory):
-	"""
+    """
 	Factory for generating email confirmations.
 	"""
-	email = factory.SubFactory("rest_social_email_auth.factories.EmailFactory")
 
-	class Meta(object):
-		model = models.EmailConfirmation
+    email = factory.SubFactory("rest_social_email_auth.factories.EmailFactory")
+
+    class Meta(object):
+        model = models.EmailConfirmation
 
 
 class PasswordResetTokenFactory(factory.django.DjangoModelFactory):
-	"""
+    """
 	Factory for generating password reset tokens.
 	"""
 
-	email = factory.SubFactory("rest_social_email_auth.factories.EmailFactory")
+    email = factory.SubFactory("rest_social_email_auth.factories.EmailFactory")
 
-	class Meta(object):
-		model = "rest_social_email_auth.PasswordResetToken"
+    class Meta(object):
+        model = "rest_social_email_auth.PasswordResetToken"

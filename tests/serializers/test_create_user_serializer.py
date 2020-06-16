@@ -1,7 +1,7 @@
 try:
-	from unittest import mock
+    from unittest import mock
 except ImportError:
-	import mock
+    import mock
 
 from django.contrib.auth import get_user_model
 

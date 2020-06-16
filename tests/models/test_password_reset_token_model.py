@@ -32,9 +32,7 @@ def test_send(mock_send_email, password_reset_token_factory, settings):
     Sending the token should send an email to the address associated
     with the token.
     """
-    settings.REST_EMAIL_AUTH = {
-        "PASSWORD_RESET_URL": "https://example.com/reset/{key}"
-    }
+    settings.REST_EMAIL_AUTH = {"PASSWORD_RESET_URL": "https://example.com/reset/{key}"}
 
     token = password_reset_token_factory()
     token.send()

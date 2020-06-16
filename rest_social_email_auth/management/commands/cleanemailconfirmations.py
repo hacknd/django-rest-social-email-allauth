@@ -4,6 +4,7 @@ from django.utils import timezone
 
 from rest_social_email_auth import app_settings, models
 
+
 class Command(management.BaseCommand):
     """
     Command to clean up old email confirmations.
@@ -19,9 +20,7 @@ class Command(management.BaseCommand):
         cutoff -= app_settings.CONFIRMATION_EXPIRATION
         cutoff -= app_settings.CONFIRMATION_SAVE_PERIOD
 
-        queryset = models.EmailConfirmation.objects.filter(
-            created_at__lte=cutoff
-        )
+        queryset = models.EmailConfirmation.objects.filter(created_at__lte=cutoff)
 
         count = queryset.count()
 
@@ -30,9 +29,7 @@ class Command(management.BaseCommand):
         if count:
             self.stdout.write(
                 self.style.SUCCESS(
-                    "Removed {count} old email confirmation(s)".format(
-                        count=count
-                    )
+                    "Removed {count} old email confirmation(s)".format(count=count)
                 )
             )
         else:
