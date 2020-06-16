@@ -6,5 +6,5 @@ omit = \
     rest_social_email_auth/admin.py,
     rest_email_auth/factories.py,
     */virtual/*,
-    
+    setup.*
 source = rest_social_email_auth
