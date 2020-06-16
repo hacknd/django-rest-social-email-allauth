@@ -1,0 +1,10 @@
+[run]
+branch = True
+omit = \
+    */tests/*,
+    */migrations/*,
+    rest_social_email_auth/admin.py,
+    rest_email_auth/factories.py,
+    */virtual/*,
+    
+source = rest_social_email_auth
