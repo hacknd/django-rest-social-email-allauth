@@ -1,0 +1,37 @@
+language: python
+python:
+- 3.7
+cache: pip
+env:
+- DJANGO='>= 2.0, < 2.1'
+- DJANGO='>= 2.1, < 2.2'
+- DJANGO='>= 3.0'
+install:
+- pip install --upgrade pip
+- pip install "Django $DJANGO"
+- python setup.py install
+- pip install -r requirements/test.txt
+- pip install -r requirements/ci.txt
+script:
+- black --check .
+- flake8
+- "./example_project/manage.py check"
+- coverage run -m pytest
+after_success: codecov
+jobs:
+  include:
+  - stage: TestPyPI release
+    if: tag IS present
+    python: '3.7'
+    env: DJANGO='>= 3.0, < 3.1'
+    install: skip
+    script: skip
+    after_success: echo "Skipping 'after_success' for deployment."
+    deploy:
+      provider: pypi
+      username: berniehaxx
+       password:
+    secure: l8zgUdWQC2ZF42CvhgiWtw2F0rHXoxyecDN+Z25vGkrndrwxbHGwLEjNSxmxw+xgorg1C+HOR1EdrYhgcWakhh+V6tPU3T9AxdaYWCCjKVR8suV8Qfaf1gFnRFVmIS4IcI/BaxPXS3J+9H9N20NlxhZszkCO0f3ELDtKE6Tx1GsdevqoObHY3KzpDwRFoZrCtQuGAbGDUhgps7KUEfzMDNE6Ql58ivW9IkmXE4dXHMD7uMP5/+b8cP+gXFzZNTCNKLGVQKqqIgDAV88E0AJYztAGcrRcfg6R346ExCCZDu7Io7BTHu4sycotkxLf0b+tGhfLeT4VjW9dWQXlyRIFiQd6ch8SvFQMTZZi192ShKK1mRZ87XkTiLcluC/BGDYntPQpsPNvQ3GLVT6nWIWXdeBUAZz1Wqb0pE8E3te810Xkk+Boc9koglC30QzvNEhSncKKO4BxZciMFbIlB5Lrirc1IspRYQ0lQEp5CIM8GaIoHWYe13crF8g078CpvGtJN9QThXzsQ1q4cZNEIxJ13/0WF0uh6okxIv0pVBeQPXWh3Z3V8NWE0JssWMFgyTVr45rmF2Vk2UyLQxaup1sVnKM6y7GleZqhdOsUo44t4nu6CFGG5FLJdqeuDGHHA01HccG4EKJsKSRvPD8vq70RPIXDq9xVwPg3Zm0faUrvanY=
+      distributions: sdist bdist_wheel
+      on:
+        tags: true

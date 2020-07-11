@@ -38,9 +38,7 @@ def test_list_emails(api_client, email_factory, user_factory):
     # Create email address for other user
     email_factory()
 
-    serializer = serializers.EmailSerializer(
-        user.email_addresses.all(), many=True
-    )
+    serializer = serializers.EmailSerializer(user.email_addresses.all(), many=True)
 
     api_client.force_authenticate(user=user)
 

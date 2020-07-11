@@ -12,6 +12,8 @@ dist/
 django_rest_social_email_auth.egg-info/
 docs/_build/
 htmlcov/
+.coverage
+coverage.xml
 ### macOS ###
 # General
 .DS_Store

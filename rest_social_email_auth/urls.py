@@ -9,59 +9,31 @@ app_name = "rest-social-email-auth"
 
 
 urlpatterns = [
-	path(
-		'register/',
-		views.UserCreateView.as_view(),
-		name='user-create'
-	),
-	path(
-		'login/',
-		views.UserLoginView.as_view(),
-		name='user-login'
-	),
-	path(
-		'logout/',
-		views.UserLogoutView.as_view(),
-		name='user-logout'
-	),
-	path(
-		'logout-all/',
-		views.UserLogoutAllView.as_view(),
-		name='user-logout-all'
-	),
-	path(
-		'login/social/<provider>/',
-		views.UserSocialLoginView.as_view(),
-		name='user-social-login'
-	),
-	path(
-		'emails/',
-		views.EmailListView.as_view(),
-		name="email-list"
-	),
-	url(
-		r"^emails/(?P<pk>[0-9]+)/$",
-		views.EmailDetailView.as_view(),
-		name="email-detail",
-	),
-	path(
-		'verify-email/',
-		views.EmailVerificationView.as_view(),
-		name="verify-email",
-	),
-	path(
-		'resend-verification/',
-		views.ResendVerificationView.as_view(),
-		name="resend-verification",
-	),
-	path(
-		'request-password-reset/',
-		views.PasswordResetRequestView.as_view(),
-		name="password-reset-request",
-	),
-	path(
-		'reset-password/',
-		views.PasswordResetView.as_view(),
-		name="password-reset",
-	),
+    path("register/", views.UserCreateView.as_view(), name="user-create"),
+    path("login/", views.UserLoginView.as_view(), name="user-login"),
+    path("logout/", views.UserLogoutView.as_view(), name="user-logout"),
+    path("logout-all/", views.UserLogoutAllView.as_view(), name="user-logout-all"),
+    path(
+        "login/social/<provider>/",
+        views.UserSocialLoginView.as_view(),
+        name="user-social-login",
+    ),
+    path("emails/", views.EmailListView.as_view(), name="email-list"),
+    url(
+        r"^emails/(?P<pk>[0-9]+)/$",
+        views.EmailDetailView.as_view(),
+        name="email-detail",
+    ),
+    path("verify-email/", views.EmailVerificationView.as_view(), name="verify-email",),
+    path(
+        "resend-verification/",
+        views.ResendVerificationView.as_view(),
+        name="resend-verification",
+    ),
+    path(
+        "request-password-reset/",
+        views.PasswordResetRequestView.as_view(),
+        name="password-reset-request",
+    ),
+    path("reset-password/", views.PasswordResetView.as_view(), name="password-reset",),
 ]

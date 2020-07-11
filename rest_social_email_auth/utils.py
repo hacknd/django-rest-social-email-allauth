@@ -15,7 +15,7 @@ from rest_social_email_auth.generics import CustomException
 
 
 def OAuthRedirectAuthorizationBackend(backend, code):
-	"""
+    """
 	Authorization Information for the backends to the redirect feature
 	:param backend:
 	:param code:
@@ -25,32 +25,44 @@ def OAuthRedirectAuthorizationBackend(backend, code):
 			- redirect_uri
 			- provider ( backend )
 	"""
-	if code is None:
-		try:
-			backend_class = get_backend(settings.AUTHENTICATION_BACKENDS, backend)
-			authorization_url = backend_class.AUTHORIZATION_URL
-			url_parameters = {
-				'redirect_uri': ('http://{}{}').format(
-					Site.objects.get_current().domain,
-					reverse.reverse('rest-social-email-auth:user-social-login', args=(backend,))
-				),
-				'response_type': backend_class.RESPONSE_TYPE,
-				'scope': [scope for scope in backend_class.DEFAULT_SCOPE if scope != 'openid'][0],
-				'client_id': config('SOCIAL_AUTH_' + backend.upper().replace('-', '_') + '_KEY')
-			}
-			
-			final_url = authorization_url + '?' + urllib.parse.urlencode(url_parameters)
+    if code is None:
+        try:
+            backend_class = get_backend(settings.AUTHENTICATION_BACKENDS, backend)
+            authorization_url = backend_class.AUTHORIZATION_URL
+            url_parameters = {
+                "redirect_uri": ("http://{}{}").format(
+                    Site.objects.get_current().domain,
+                    reverse.reverse(
+                        "rest-social-email-auth:user-social-login", args=(backend,)
+                    ),
+                ),
+                "response_type": backend_class.RESPONSE_TYPE,
+                "scope": [
+                    scope for scope in backend_class.DEFAULT_SCOPE if scope != "openid"
+                ][0],
+                "client_id": config(
+                    "SOCIAL_AUTH_" + backend.upper().replace("-", "_") + "_KEY"
+                ),
+            }
 
-		except:
-			raise CustomException(code=status.HTTP_501_NOT_IMPLEMENTED, detail=__('Missing Backend'))
+            final_url = authorization_url + "?" + urllib.parse.urlencode(url_parameters)
 
-		return redirect(final_url)
+        except:
+            raise CustomException(
+                code=status.HTTP_501_NOT_IMPLEMENTED, detail=__("Missing Backend")
+            )
 
-	data = {
-		"code": code,
-		"redirect_uri": ('http://{}{}').format(Site.objects.get_current().domain,
-											   reverse.reverse('rest-social-email-auth:user-social-login', args=(backend,))),
-		"provider": backend
-	}
+        return redirect(final_url)
 
-	return data
+    data = {
+        "code": code,
+        "redirect_uri": ("http://{}{}").format(
+            Site.objects.get_current().domain,
+            reverse.reverse(
+                "rest-social-email-auth:user-social-login", args=(backend,)
+            ),
+        ),
+        "provider": backend,
+    }
+
+    return data
