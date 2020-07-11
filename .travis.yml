@@ -1,52 +1,37 @@
----
 language: python
 python:
-  - 3.7
-
+- 3.7
 cache: pip
-
 env:
-  
-  - DJANGO='>= 2.0, < 2.1'
-  - DJANGO='>= 2.1, < 2.2'
-  - DJANGO='>= 3.0'
-
+- DJANGO='>= 2.0, < 2.1'
+- DJANGO='>= 2.1, < 2.2'
+- DJANGO='>= 3.0'
 install:
-  - pip install --upgrade pip
-  - pip install "Django $DJANGO"
-  - python setup.py install
-  - pip install -r requirements/test.txt
-  - pip install -r requirements/ci.txt
-
+- pip install --upgrade pip
+- pip install "Django $DJANGO"
+- python setup.py install
+- pip install -r requirements/test.txt
+- pip install -r requirements/ci.txt
 script:
-  - black --check .
-  - flake8
-  - ./example_project/manage.py check
-  - coverage run -m pytest
-
+- black --check .
+- flake8
+- "./example_project/manage.py check"
+- coverage run -m pytest
 after_success: codecov
-
-# Add job to deploy to PyPI after tests complete
 jobs:
   include:
-    - stage: TestPyPI release
-      if: tag IS present
-
-      python: "3.7"
-      env: DJANGO='>= 3.0, < 3.1'
-
-      # Skip usual steps
-      install: skip
-      script: skip
-      # Can't just skip after_success because then the deployment gets skipped.
-      # Issue: https://github.com/travis-ci/travis-ci/issues/8337 
-      after_success: echo "Skipping 'after_success' for deployment."
-
-      deploy:
-        provider: pypi
-        user: berniehaxx
-        password:
-          secure: "ToN4T1xiV968CQyV0VfKQJiKAhHHs376Mnph4QKU3tq+GCppLJTYJmwROcFy6F6dcAtCHwOUkiXLdVShMC/+GWzts9Zh++FUr+r+io4oY2vXNFUp7+SZlr2etleY88HBOZfu1mgcNh3CjhjcpmgEy2c8z7H7NQH4HsDUdFX/xXYUvvcJDThUw6ChMFj7AT6BUjKd3rcST3NpI0V32ZlCjqBlkynUcC7NiZd1DaOXlNgyNj433IkfmbJ9uMr/mYNVTRLbdj5q+vnXGZTt2c1C5COs41GZ2TvlYkAn6wh2Hf5GJMNw/O8gQ75OkllgDl3L49EyaDniFyPonvh9bacXNAHQnnVGAhhuwkF/yPbmnCy1H22sqJ1iSvUJWAbvZ2+AP/SFc5hnTSIN06BwPs0IJk1UFvR3R9xDTjS2T5ef7N2N+bds+Z4ZstCfoBqM1vmLHoky+56doGZEdTzd4RHkNxyFLjpE59gUGTLU4d6Dnp77MeQdb9KwWgylLIxbwBOOJTKsuzPqcbO+vx4mOMynoq6wKL7V5QNUcegU8ynAZG5R26d7It/MKPUsrYPLvvSM5yz1rGsj8Q5owr8ZlS8loVNe/5J5tEnKjuCwShKbDsjBdPVejH3SS/Yr9iTg/YB1LBiTkEOcvXZZdfK6+wG+CRTD4jajuTnB+5q4fbpC8yE="
-        distributions: sdist bdist_wheel
-        on:
-          tags: yes
+  - stage: TestPyPI release
+    if: tag IS present
+    python: '3.7'
+    env: DJANGO='>= 3.0, < 3.1'
+    install: skip
+    script: skip
+    after_success: echo "Skipping 'after_success' for deployment."
+    deploy:
+      provider: pypi
+      username: berniehaxx
+       password:
+    secure: l8zgUdWQC2ZF42CvhgiWtw2F0rHXoxyecDN+Z25vGkrndrwxbHGwLEjNSxmxw+xgorg1C+HOR1EdrYhgcWakhh+V6tPU3T9AxdaYWCCjKVR8suV8Qfaf1gFnRFVmIS4IcI/BaxPXS3J+9H9N20NlxhZszkCO0f3ELDtKE6Tx1GsdevqoObHY3KzpDwRFoZrCtQuGAbGDUhgps7KUEfzMDNE6Ql58ivW9IkmXE4dXHMD7uMP5/+b8cP+gXFzZNTCNKLGVQKqqIgDAV88E0AJYztAGcrRcfg6R346ExCCZDu7Io7BTHu4sycotkxLf0b+tGhfLeT4VjW9dWQXlyRIFiQd6ch8SvFQMTZZi192ShKK1mRZ87XkTiLcluC/BGDYntPQpsPNvQ3GLVT6nWIWXdeBUAZz1Wqb0pE8E3te810Xkk+Boc9koglC30QzvNEhSncKKO4BxZciMFbIlB5Lrirc1IspRYQ0lQEp5CIM8GaIoHWYe13crF8g078CpvGtJN9QThXzsQ1q4cZNEIxJ13/0WF0uh6okxIv0pVBeQPXWh3Z3V8NWE0JssWMFgyTVr45rmF2Vk2UyLQxaup1sVnKM6y7GleZqhdOsUo44t4nu6CFGG5FLJdqeuDGHHA01HccG4EKJsKSRvPD8vq70RPIXDq9xVwPg3Zm0faUrvanY=
+      distributions: sdist bdist_wheel
+      on:
+        tags: true
