@@ -1,0 +1,2 @@
+Django==3.0.7
+rest-social-email-auth==0.1.0
