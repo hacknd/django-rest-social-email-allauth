@@ -43,7 +43,7 @@ setup(
 		"djangorestframework >= 3.0",
 		"django-email-utils < 1.0",
 		"django-rest-knox > 4.0",
-		"social-auth-app-django>=3.1.0",
+		"social-auth-app-django<=3.1.0",
 		"rest-social-auth>=2.1.0"
 	],
 )
