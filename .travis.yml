@@ -15,7 +15,7 @@ install:
 script:
 - black --check .
 - flake8
-- python ./example/manage.py check
+- python ./tests/manage.py check
 - coverage run -m pytest
 after_success: codecov
 jobs:
