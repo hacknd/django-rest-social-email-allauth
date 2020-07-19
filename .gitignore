@@ -9,7 +9,7 @@ media
 server/static
 build/
 dist/
-django_rest_social_email_auth.egg-info/
+django_rest_social_email_allauth.egg-info/
 docs/_build/
 htmlcov/
 .coverage
