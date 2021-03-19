@@ -12,7 +12,7 @@ colorama==0.4.3
 coverage==5.1
 cryptography==2.9.2
 defusedxml==0.7.0rc1
-Django==3.0.7
+Django==3.1.6
 django-email-utils==1.0.0
 django-rest-knox==4.1.0
 djangorestframework==3.11.0
