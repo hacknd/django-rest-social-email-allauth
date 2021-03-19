@@ -15,7 +15,7 @@ defusedxml==0.7.0rc1
 Django==3.0.7
 django-email-utils==1.0.0
 django-rest-knox==4.1.0
-djangorestframework==3.11.0
+djangorestframework==3.11.2
 docutils==0.16
 factory-boy==2.12.0
 Faker==4.1.0
