@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
 from datetime import timedelta
-from decouple import config
+
 
 import os
 
@@ -100,6 +100,3 @@ EMAIL_AUTH = {
     "PASSWORD_RESET_URL": "https://example.com/reset/{key}",
 }
 
-# Discord Credentials here
-SOCIAL_AUTH_DISCORD_KEY = config("SOCIAL_AUTH_DISCORD_KEY")
-SOCIAL_AUTH_DISCORD_SECRET = config("SOCIAL_AUTH_DISCORD_SECRET")
